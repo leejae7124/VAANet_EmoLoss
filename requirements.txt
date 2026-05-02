@@ -1,0 +1,12 @@
+cffi==1.14.0
+decorator==4.4.2
+joblib>=1.0.0
+Pillow>=8
+protobuf==3.12.2
+pycparser==2.20
+resampy==0.2.2
+six==1.15.0
+SoundFile
+tensorboardX==2.0
+threadpoolctl==2.1.0
+
