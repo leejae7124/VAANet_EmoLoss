@@ -59,6 +59,9 @@ def load_parse_opts():
     if args.env == "school":
         print("school")
         from opts_ve8_school import parse_opts
+    elif args.env == "edu":
+        print("edu")
+        from opts_ve8_edu import parse_opts
     else:
         print("lab")
         from opts_ve8 import parse_opts

@@ -37,7 +37,7 @@ class PCCEVE8(nn.Module):
         weight = [1] * batch_size
 
         out = self.f0(y_pred, y)
-        _, y_pred_label = f.softmax(y_pred, dim=1).topk(k=1, dim=1)
+        _, y_pred_label = F.softmax(y_pred, dim=1).topk(k=1, dim=1)
         y_pred_label = y_pred_label.squeeze(dim=1)
         y_numpy = y.cpu().numpy()
         y_pred_label_numpy = y_pred_label.cpu().numpy()
