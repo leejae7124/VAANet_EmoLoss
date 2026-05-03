@@ -151,7 +151,6 @@ dependencies:
       - sympy==1.14.0
       - tensorboardx==2.0
       - threadpoolctl==3.6.0
-      - torch==2.7.1+cu128
       - torchvision==0.22.1
       - tqdm==4.67.1
       - triton==3.3.1
