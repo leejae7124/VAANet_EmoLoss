@@ -1,0 +1,13 @@
+name: vaanet_stable
+channels:
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - python=3.9
+  - numpy=1.24.4
+  - scipy
+  - scikit-learn
+  - audioread
+  - numba
+  - tensorboard
+prefix: /home/leessu/miniconda3/envs/vaanet_stable
