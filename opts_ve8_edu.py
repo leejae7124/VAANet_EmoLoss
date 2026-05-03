@@ -36,7 +36,7 @@ def parse_opts():
                  type=str,
                  help="Local path of result directory"),
             dict(name='--saliency_path',
-                 default="/home/jovyan/work/prj_data/VideoEmotion8--saliency",
+                 default="/home/jovyan/work/storages/VideoEmotion8--saliency/VideoEmotion8--saliency",
                  type=str,
                  help='Local path of saliency'),
             dict(name='--expr_name',
