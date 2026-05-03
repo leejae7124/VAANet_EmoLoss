@@ -49,7 +49,7 @@ from tensorboardX import SummaryWriter
 #     return mean, std
 def load_parse_opts():
     bootstrap = argparse.ArgumentParser(add_help=False)
-    bootstrap.add_argument("--env", choices=["lab", "school"], default="lab")
+    bootstrap.add_argument("--env", choices=["lab", "edu", "school"], default="lab")
 
     args, remaining = bootstrap.parse_known_args()
 
