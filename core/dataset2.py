@@ -1,6 +1,7 @@
 from datasets.ve8 import VE8Dataset
 from datasets.tsl import TSLDataset
 from datasets.caer import CAERDataset
+from datasets.emovid import EmoVidDataset
 from torch.utils.data import DataLoader
 
 
@@ -52,6 +53,21 @@ def get_caer(opt, subset, transforms, saliency_transform):
         need_audio=True,
     )
 
+def get_emovid(opt, subset, transforms, saliency_transform):
+    spatial_transform, temporal_transform, target_transform = transforms
+    return EmoVidDataset(
+        video_path=opt.video_path,
+        audio_path=opt.audio_path,
+        saliency_path=opt.saliency_path,
+        subset=subset,
+        fps=opt.fps,
+        spatial_transform=spatial_transform,
+        temporal_transform=temporal_transform,
+        target_transform=target_transform,
+        saliency_transform=saliency_transform,
+        need_audio=True
+    )
+
 
 def get_training_set(opt, spatial_transform, temporal_transform, target_transform, saliency_transform):
     transforms = [spatial_transform, temporal_transform, target_transform]
@@ -62,6 +78,8 @@ def get_training_set(opt, spatial_transform, temporal_transform, target_transfor
         return get_tsl(opt, 'train', transforms, saliency_transform)
     elif opt.dataset == 'caer':
         return get_caer(opt, 'train', transforms, saliency_transform)
+    elif opt.dataset == 'emovid':
+        return get_emovid(opt, 'train', transforms, saliency_transform)
     else:
         raise Exception
 
@@ -75,6 +93,8 @@ def get_validation_set(opt, spatial_transform, temporal_transform, target_transf
         return get_tsl(opt, 'validation', transforms, saliency_transform)
     elif opt.dataset == 'caer':
         return get_caer(opt, 'validation', transforms, saliency_transform)
+    elif opt.dataset == 'emovid':
+        return get_emovid(opt, 'validation', transforms, saliency_transform)
     else:
         raise Exception
 
@@ -88,6 +108,8 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform, s
         return get_tsl(opt, 'test', transforms, saliency_transform)
     elif opt.dataset == 'caer':
         return get_caer(opt, 'test', transforms, saliency_transform)
+    elif opt.dataset == 'emovid':
+        return get_emovid(opt, 'test', transforms, saliency_transform)
     else:
         raise Exception
 

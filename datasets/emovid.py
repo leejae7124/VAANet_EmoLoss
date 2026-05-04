@@ -1,5 +1,4 @@
 import os
-import json
 import functools
 import librosa
 import numpy as np
@@ -68,19 +67,10 @@ def get_default_saliency_loader():
     return functools.partial(saliency_loader, saliency_image_loader=saliency_image_loader)
 
 
-def load_annotation_data(annotation_file_path):
-    with open(annotation_file_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
 def preprocess_audio(audio_path):
     y, sr = librosa.load(audio_path, sr=44100)
     mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=32)
     return mfccs
-
-
-def normalize_label(x):
-    return str(x).strip().lower()
 
 
 def get_class_labels(frame_root_path):
@@ -111,7 +101,6 @@ def get_class_labels(frame_root_path):
 
 def make_dataset(frame_root_path,
                  audio_root_path,
-                 annotation_root_path,
                  saliency_root_path,
                  subset,
                  fps=30,
@@ -120,12 +109,10 @@ def make_dataset(frame_root_path,
     class_to_idx, idx_to_class = get_class_labels(frame_root_path)
 
     subset_frame_root = os.path.join(frame_root_path, subset)
-    subset_audio_root = os.path.join(audio_root_path, subset) if audio_root_path is not None else None
-    subset_annotation_root = os.path.join(annotation_root_path, subset)
-    subset_saliency_root = os.path.join(saliency_root_path, subset) if saliency_root_path is not None else None
+    subset_audio_root = os.path.join(audio_root_path, subset) if need_audio else None
+    subset_saliency_root = os.path.join(saliency_root_path, subset) if need_saliency else None
 
     assert os.path.isdir(subset_frame_root), f"frame subset dir does not exist: {subset_frame_root}"
-    assert os.path.isdir(subset_annotation_root), f"annotation subset dir does not exist: {subset_annotation_root}"
     if need_audio:
         assert os.path.isdir(subset_audio_root), f"audio subset dir does not exist: {subset_audio_root}"
     if need_saliency:
@@ -146,21 +133,12 @@ def make_dataset(frame_root_path,
                 continue
 
             audio_path = os.path.join(subset_audio_root, class_name, f"{clip_id}.mp3") if need_audio else None
-            annotation_path = os.path.join(subset_annotation_root, class_name, f"{clip_id}.json")
             saliency_dir = os.path.join(subset_saliency_root, class_name, clip_id) if need_saliency else None
 
-            assert os.path.exists(annotation_path), f"annotation does not exist: {annotation_path}"
             if need_audio:
                 assert os.path.exists(audio_path), f"audio does not exist: {audio_path}"
             if need_saliency:
                 assert os.path.isdir(saliency_dir), f"saliency dir does not exist: {saliency_dir}"
-
-            meta = load_annotation_data(annotation_path)
-
-            # annotation의 emotion과 폴더명이 다르면 경고만 출력
-            anno_label = normalize_label(meta.get("emotion", class_name))
-            if anno_label != normalize_label(class_name):
-                print(f"[warn] label mismatch: folder={class_name}, annotation={anno_label}, clip={clip_id}")
 
             n_frames_file_path = os.path.join(frame_dir, "n_frames")
             if os.path.exists(n_frames_file_path):
@@ -175,21 +153,14 @@ def make_dataset(frame_root_path,
 
             sample = {
                 "video": frame_dir,
-                "audio": audio_path,
-                "annotation": annotation_path,
-                "saliency": saliency_dir,
+                "audio": audio_path if need_audio else None,
+                "saliency": saliency_dir if need_saliency else None,
                 "segment": [1, n_frames],
                 "n_frames": n_frames,
                 "video_id": clip_id,
-                "source_video_id": meta.get("video_id", clip_id),
                 "label_name": class_name,
                 "label": class_to_idx[class_name],
                 "frame_indices": list(range(1, n_frames + 1, step)),
-                "duration": meta.get("duration", None),
-                "caption": meta.get("caption", None),
-                "brightness": meta.get("brightness", None),
-                "colorfulness": meta.get("colorfulness", None),
-                "hue": meta.get("hue", None),
             }
             dataset.append(sample)
 
@@ -203,7 +174,6 @@ class _BaseEmoVidDataset(data.Dataset):
     def __init__(self,
                  video_path,
                  audio_path,
-                 annotation_path,
                  saliency_path=None,
                  subset="train",
                  fps=30,
@@ -218,7 +188,6 @@ class _BaseEmoVidDataset(data.Dataset):
         self.data, self.class_names = make_dataset(
             frame_root_path=video_path,
             audio_root_path=audio_path,
-            annotation_root_path=annotation_path,
             saliency_root_path=saliency_path,
             subset=subset,
             fps=fps,
@@ -252,8 +221,8 @@ class _BaseEmoVidDataset(data.Dataset):
         data_item = self.data[index]
 
         video_path = data_item["video"]
-        saliency_path = data_item["saliency"]
         frame_indices = data_item["frame_indices"]
+        saliency_path = data_item["saliency"]
 
         if self.temporal_transform is not None:
             snippets_frame_idx = self.temporal_transform(frame_indices)
@@ -308,7 +277,6 @@ class EmoVidDataset(_BaseEmoVidDataset):
     def __init__(self,
                  video_path,
                  audio_path,
-                 annotation_path,
                  saliency_path,
                  subset,
                  fps=30,
@@ -322,7 +290,6 @@ class EmoVidDataset(_BaseEmoVidDataset):
         super().__init__(
             video_path=video_path,
             audio_path=audio_path,
-            annotation_path=annotation_path,
             saliency_path=saliency_path,
             subset=subset,
             fps=fps,
@@ -346,7 +313,6 @@ class EmoVidBaselineDataset(_BaseEmoVidDataset):
     def __init__(self,
                  video_path,
                  audio_path,
-                 annotation_path,
                  subset,
                  fps=30,
                  spatial_transform=None,
@@ -357,7 +323,6 @@ class EmoVidBaselineDataset(_BaseEmoVidDataset):
         super().__init__(
             video_path=video_path,
             audio_path=audio_path,
-            annotation_path=annotation_path,
             saliency_path=None,
             subset=subset,
             fps=fps,
