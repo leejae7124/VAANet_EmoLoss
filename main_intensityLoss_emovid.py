@@ -58,7 +58,7 @@ def load_parse_opts():
 
     if args.env == "school":
         print("school")
-        from opts_tsl_school import parse_opts
+        from opts_emovid_school import parse_opts
     else:
         print("lab")
         from opts_emovid import parse_opts
