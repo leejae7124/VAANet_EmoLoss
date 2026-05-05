@@ -80,6 +80,12 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt, class_name
         video_id = visualization_item[0]
         # print("visualization: ", visualization_item)
         # print("video_id: ", video_id)
+        if epoch == 1 and i == 0:
+            print("visual", visual.shape)
+            print("saliency_map", saliency_map.shape)
+            print("audio", audio.shape)
+            print("target", target.shape)
+            
         data_time.update(time.time() - end_time)
 
         # warmup_epoch는 1로 둔다고 가정 (epoch 번호가 1부터 시작하므로 epoch==1이 첫 epoch)
