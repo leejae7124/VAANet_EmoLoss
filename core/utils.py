@@ -199,6 +199,37 @@ def run_model_loss(opt, inputs, model, criterion, i=0, print_attention=True, per
             ratio = (lam * align / (cls + 1e-12)).item()
             print(f"[loss] cls={cls.item():.4f}  align={align.item():.4f}  "
                 f"lambda={lam:.3f}  total={loss.item():.4f}  (lam*align/cls={ratio:.3f})")
+            
+             # ✅ IntensityAll / IntensityCombo 항별 값 출력
+            terms = getattr(criterion.intensity_loss, "last_terms", None)
+
+            if terms is not None and len(terms) > 0:
+                w_rmse = float(getattr(criterion.intensity_loss, "w_rmse", 1.0))
+                w_grad = float(getattr(criterion.intensity_loss, "w_grad", 0.0))
+                w_normal = float(getattr(criterion.intensity_loss, "w_normal", 1.0))
+
+                rmse = terms.get("rmse", None)
+                grad = terms.get("grad", None)
+                normal = terms.get("normal", None)
+                align_total = terms.get("total", None)
+
+                print(
+                    "[align terms] "
+                    f"rmse={rmse}  "
+                    f"grad={grad}  "
+                    f"normal={normal}  "
+                    f"align_total={align_total}"
+                )
+
+                # 선택: weight가 곱해진 항도 같이 출력
+                msg = "[weighted terms] "
+                if rmse is not None:
+                    msg += f"w_rmse*rmse={w_rmse * rmse:.4f}  "
+                if grad is not None:
+                    msg += f"w_grad*grad={w_grad * grad:.4f}  "
+                if normal is not None:
+                    msg += f"w_normal*normal={w_normal * normal:.4f}  "
+                print(msg)
         # loss = criterion(y_pred, target, cam_map=cam_map, saliency_map=saliency_map)
     else:
         # val/test 또는 CE-only 상황

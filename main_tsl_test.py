@@ -1,7 +1,9 @@
 import torch
 from torch.cuda import device_count
+import numpy as np
+import random
 
-from opts_tsl import parse_opts
+from opts_tsl_test import parse_opts
 from core.model import generate_model_intensity
 from core.loss import get_loss
 from core.utils import local2global_path, get_spatial_transform, get_saliency_transform
@@ -12,11 +14,22 @@ from transforms.target import ClassLabel
 
 from test_tsl import test_epoch
 
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
 
 def main():
     opt = parse_opts()
     opt.device_ids = list(range(device_count()))
     local2global_path(opt)
+
+    set_seed(42)
 
     # 학습 때와 동일하게
     opt.saliency_level = 'feature_map'

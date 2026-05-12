@@ -3,6 +3,8 @@
 import sys
 import argparse
 import torch
+import numpy as np
+import random
 
 from core.model import generate_model_intensity
 from core.loss import get_loss
@@ -65,11 +67,22 @@ def load_parse_opts():
 
     return parse_opts
 
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
 def main():
     parse_opts = load_parse_opts()
     opt = parse_opts()
     opt.device_ids = list(range(device_count()))
     local2global_path(opt)
+
+    set_seed(42)
 
     # train
     spatial_transform = get_spatial_transform(opt, 'train') #여기에서 Preprocessing 객체 생성
