@@ -75,6 +75,8 @@
 #         'optimizer': optimizer.state_dict(),
 #     }
 #     torch.save(states, save_file_path)
+
+#acc1 기준 기록
 from core.utils import AverageMeter, process_data_item, run_model, calculate_accuracy
 import matplotlib.pyplot as plt
 import os
@@ -184,8 +186,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, writer, optimizer):
     val_macro_f1 = compute_macro_f1(y_true, y_pred, num_classes)
 
     writer.add_scalar('val/loss', val_loss, epoch)
-    writer.add_scalar('val/acc', val_acc, epoch)
-    writer.add_scalar('val/macro_f1', val_macro_f1, epoch)   # ✅ 추가
+    writer.add_scalar('val/acc1', val_acc, epoch)
+    writer.add_scalar('val/macro_f1_acc1', val_macro_f1, epoch)   # ✅ 추가
 
     print("Val loss: {:.4f}".format(val_loss))
     print("Val acc: {:.4f}".format(val_acc))

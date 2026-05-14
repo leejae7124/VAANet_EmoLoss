@@ -16,7 +16,7 @@ def parse_opts():
                  type=str,
                  help='Global path of pretrained 3d resnet101 model (.pth)'),
             dict(name='--checkpoint_path',
-                         default='/home/leessu/code/VAANet_EmoLoss/tools/annotations/tsl/results/result_20260511_085751/checkpoints/save_4_0.6683.pth',
+                         default='/mnt/Members/leessu/EmoCam_weights/VAANet_saliency_weights/Saliency_EmoLoss/TSL-300/result_20260512_162218/checkpoints/save_3_0.6784.pth',
                     #  default='/home/leessu/code/VAANet_Loss/tools/annotations/tsl/results/result_20260430_135357/checkpoints/save_4_0.7085.pth',
                  type=str,
                  help='Path of the saved model checkpoint (.pth)'),
@@ -131,7 +131,7 @@ def parse_opts():
                  help='Use only visual stream for the model and dataset.'),
             dict(
                 name='--n_threads',
-                default=16,
+                default=0,
                 type=int,
                 help='Number of threads for multi-thread loading',
             ),
