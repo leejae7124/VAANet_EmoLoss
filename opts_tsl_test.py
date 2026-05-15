@@ -16,7 +16,7 @@ def parse_opts():
                  type=str,
                  help='Global path of pretrained 3d resnet101 model (.pth)'),
             dict(name='--checkpoint_path',
-                         default='/mnt/Members/leessu/EmoCam_weights/VAANet_saliency_weights/Saliency_EmoLoss/TSL-300/result_20260512_162218/checkpoints/save_3_0.6784.pth',
+                         default='/mnt/Members/leessu/EmoCam_weights/VAANet_saliency_weights/Saliency_EmoLoss/TSL-300/result_20260514_154456/checkpoints/save_5_0.7186.pth',
                     #  default='/home/leessu/code/VAANet_Loss/tools/annotations/tsl/results/result_20260430_135357/checkpoints/save_4_0.7085.pth',
                  type=str,
                  help='Path of the saved model checkpoint (.pth)'),
