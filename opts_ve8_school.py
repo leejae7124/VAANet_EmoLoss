@@ -135,7 +135,7 @@ def parse_opts():
                  help='Use only visual stream for the model and dataset.'),
             dict(
                 name='--n_threads',
-                default=0,
+                default=4,
                 type=int,
                 help='Number of threads for multi-thread loading',
             ),
