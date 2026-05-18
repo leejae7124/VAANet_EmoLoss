@@ -85,7 +85,7 @@ def main():
     # validation
     spatial_transform = get_spatial_transform(opt, 'test')
     saliency_transform = get_saliency_transform(opt, 'test', spatial_transform)
-    temporal_transform = TSN(seq_len=opt.seq_len, snippet_duration=opt.snippet_duration, center=False)
+    temporal_transform = TSN(seq_len=opt.seq_len, snippet_duration=opt.snippet_duration, center=True)
     target_transform = ClassLabel()
     validation_data = get_validation_set(opt, spatial_transform, temporal_transform, target_transform, saliency_transform)
     val_loader = get_data_loader(opt, validation_data, shuffle=False)
