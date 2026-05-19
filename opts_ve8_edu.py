@@ -28,7 +28,7 @@ def parse_opts():
                  type=str,
                  help='Local path of videos', ),
             dict(name="--annotation_path",
-                 default='/home/jovyan/work/prj_data/ve8_01.json',
+                 default='/home/jovyan/work/prj_data/ve8_03.json',
                  type=str,
                  help='Local path of annotation file'),
             dict(name="--result_path",
