@@ -95,6 +95,9 @@ class Intensity(nn.Module):
         # 현재 epoch에서 통계를 모을지 여부 (파이썬 bool)
         self._collect_this_epoch = False
 
+        self.last_calib = {}
+        self.last_batch_p95 = None
+
     def begin_epoch(self, epoch: int):
         """
         train loop에서 epoch 시작 시 호출.
@@ -110,21 +113,50 @@ class Intensity(nn.Module):
         self.epoch_cnt.zero_()
 
     @torch.no_grad()
-    def end_epoch(self):
-        """
-        train loop에서 epoch 끝날 때 호출.
-        누적된 통계로 scale을 갱신.
-        """
-        if self.cam_calib != "epoch_p95":
-            return
-        if not self._collect_this_epoch:
-            return
+    def end_epoch(self, epoch=None):
+        old_scale = float(self.scale.item())
+        cnt = int(self.epoch_cnt.item())
 
-        if self.epoch_cnt.item() > 0:
+        log_dict = {
+            "old_scale": old_scale,
+            "new_scale": old_scale,
+            "scale": old_scale,
+            "epoch_cnt": float(cnt),
+            "updated": 0.0,
+        }
+
+        if self.cam_calib != "epoch_p95":
+            self.last_calib = log_dict
+            return log_dict
+
+        if not self._collect_this_epoch:
+            self.last_calib = log_dict
+            return log_dict
+
+        if cnt > 0:
             new_scale = (self.epoch_sum / self.epoch_cnt.float()).clamp_min(self.eps)
             self.scale.copy_(new_scale)
 
+            new_scale_float = float(new_scale.item())
+            log_dict = {
+                "old_scale": old_scale,
+                "new_scale": new_scale_float,
+                "scale": new_scale_float,
+                "epoch_cnt": float(cnt),
+                "updated": 1.0,
+            }
+
+            print(
+                f"[CAM CALIB] epoch={epoch} "
+                f"old_scale={old_scale:.8f} "
+                f"new_scale={new_scale_float:.8f} "
+                f"cnt={cnt}",
+                flush=True
+            )
+
         self._collect_this_epoch = False
+        self.last_calib = log_dict
+        return log_dict
 
     @torch.no_grad()
     def _batch_p95(self, x: torch.Tensor) -> torch.Tensor:
