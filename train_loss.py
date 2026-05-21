@@ -176,9 +176,9 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt, class_name
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                   'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
                 epoch, i + 1, len(data_loader), batch_time=batch_time, data_time=data_time, loss=losses, acc=accuracies))
-            
+
     # epoch 끝
-    if opt.loss_func.startswith("ce_intensity"):
+    if opt.loss_func.startswith("ce_intensity") and hasattr(criterion, "intensity_loss"):
         cam_logs = criterion.intensity_loss.end_epoch(epoch)
 
         if cam_logs is not None:
